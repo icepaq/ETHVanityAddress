@@ -7,32 +7,32 @@ import Swal from 'sweetalert2'
 const Home: NextPage = () => {
     const submit = (e: any) => {
         const code = document.getElementById('code') as HTMLInputElement;
-        const wallet = document.getElementById('wallet') as HTMLInputElement;
 
-        console.log(code.value, wallet.value);
-
-        if(wallet.value.length > 7) { // Includex 0x
-            Swal.fire('Wallet start must be less than 5 characters');
-            return;
-        }
-
-        fetch('/api/genkey?wallet=' + wallet.value + '&key=' + code.value).then(res => res.json()).then(res => {
-            console.log(res);
-            if(res.wallet.status == 'generating') {
-                window.location.href = '/getwallet';
+        fetch('/api/getwallet?key=' + code.value).then(res => res.json()).then(res => {
+            let HTML;
+            
+            if(res.wallet == null) {
+                 HTML = 'Your wallet is not ready yet';
             } else {
-                Swal.fire('Error!', res.message, 'error');
+                HTML = 'Address: ' + res.wallet.address + '<br />' +
+                        'Private Key: ' + res.wallet.privateKey + '<br />' +
+                        'Public Key: ' + res.wallet.publicKey;
             }
+            
+            Swal.fire({
+                title: 'Wallet',
+                html: HTML,
+            });
+            console.log(res);
         });
     }
     return(
         <>
         <div className={styles.wrapper}>
             <div className={styles.container}>
-                <h2 className={styles.title}>Custom ETH Wallet</h2>
+                <h2 className={styles.title}>Please Enter Your Access Code</h2>
                 <div className={styles.form}>
                     <input type='text' placeholder='Access Code' className={styles.input} id='code' /> <br />
-                    <input type='text' placeholder='0xAnton' className={styles.input} id='wallet' />
 
                     <div className={styles.button} onClick={submit}>
                         Submit
